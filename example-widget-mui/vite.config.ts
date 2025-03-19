@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Nordeck IT + Consulting GmbH
+ * Copyright 2025 Xurge Digital Lab LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ import basicSsl from '@vitejs/plugin-basic-ssl';
 import react from '@vitejs/plugin-react-swc';
 import { Plugin, PluginOption, defineConfig } from 'vite';
 
-const plugins: [Plugin | PluginOption] = [react()];
+const plugins: (Plugin | PluginOption)[] = [react()];
 let port = 5173;
 
 if (process.env.VITE_DEV_SSL === 'true') {
@@ -49,17 +49,24 @@ export default defineConfig({
     ],
   },
   server: {
-    fs: {
-      allow: ['..'],
-    },
-    port,
+    port: 5173,
     strictPort: true,
+    allowedHosts: [
+      'example.url' // <<<<<<<<<<<<< ALLOW YOUR HOST HERE
+      // 'localhost', // Allow local development
+    ],
+    proxy: {
+      '/api': {
+        target: 'https://xrplexplorer.com',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ''),
+      },
+    },
   },
   preview: {
     port: port - 1000,
     strictPort: true,
   },
   plugins,
-  // Use the env prefix from CRA for backward compatibility.
   envPrefix: 'REACT_APP_',
 });
